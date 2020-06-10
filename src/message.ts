@@ -16,6 +16,22 @@ const send_monthly_msg = () => {
     fixed_date: number;
   }
 
+  const cw_send_message = (room_id, text) => {
+    const CW_API_TOKEN = PropertiesService.getScriptProperties().getProperty('CW_TOKEN');
+    console.log(CW_API_TOKEN)
+    const options = {
+      "method": "post",
+      "headers": {
+        "X-ChatWorkToken": CW_API_TOKEN
+      },
+      "payload": {
+        "body": text
+      }
+    };
+    const apiUrl = "https://api.chatwork.com/v2/rooms/" + room_id + "/messages";
+    const response = UrlFetchApp.fetch(apiUrl, options);
+  };
+
   for (let row_n = sheet.getLastRow() - 1; row_n > first_row; row_n--) {
     // ルームIDがなければcontinue
     if (sheet_data[row_n][room_id_column] == "") {
@@ -32,7 +48,11 @@ const send_monthly_msg = () => {
       continue
     }
 
+    const message_body = sheet_data[row_n][message_column]
+    cw_send_message(room_id, message_body)
 
 
   }
+
+
 }
