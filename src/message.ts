@@ -26,12 +26,12 @@ const send_monthly_msg = () => {
     let message_body = sheet_data[row_n][message_column]
     let routine_day = sheet_data[row_n][sending_date_column]
     // ルームIDがなければcontinue
-    if (sheet_data[row_n][room_id_column] == "") {
+    if (room_id == "") {
       continue
     }
 
     // メッセージ本文がなければcontinue
-    if (sheet_data[row_n][message_column] == "") {
+    if (message_body == "") {
       continue
     }
 
