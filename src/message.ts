@@ -9,6 +9,12 @@ const send_monthly_msg = () => {
   const message_column = 2 - 1;
   const sending_date_column = 3 - 1;
 
+  //今日の取得
+  const today = new Date()
+  const dd_num = Utilities.formatDate(today, 'Asia/Tokyo', 'dd')
+  console.log(dd_num)
+
+
   interface request_message_obj {
     room_id: string;
     mssage_body: string;
@@ -29,8 +35,15 @@ const send_monthly_msg = () => {
       continue
     }
 
+    /*
     // メッセージの送信日がなければcontinue
     if (sheet_data[row_n][sending_date_column] == "") {
+      continue
+    }
+    */
+
+    // 今日の日付と設定した日付が一致しなければcontinue
+    if (dd_num != routine_day) {
       continue
     }
 
