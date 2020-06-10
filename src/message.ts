@@ -1,6 +1,5 @@
 const send_monthly_msg = () => {
   const sheet_name = "【毎月】メッセージ"
-  const room_id = "*********"
 
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheet_name)
   const sheet_data = sheet.getDataRange().getValues()
@@ -16,23 +15,10 @@ const send_monthly_msg = () => {
     fixed_date: number;
   }
 
-  const cw_send_message = (room_id, text) => {
-    const CW_API_TOKEN = PropertiesService.getScriptProperties().getProperty('CW_TOKEN');
-    console.log(CW_API_TOKEN)
-    const options = {
-      "method": "post",
-      "headers": {
-        "X-ChatWorkToken": CW_API_TOKEN
-      },
-      "payload": {
-        "body": text
-      }
-    };
-    const apiUrl = "https://api.chatwork.com/v2/rooms/" + room_id + "/messages";
-    const response = UrlFetchApp.fetch(apiUrl, options);
-  };
-
-  for (let row_n = sheet.getLastRow() - 1; row_n > first_row; row_n--) {
+  for (let row_n = sheet.getLastRow() - 1; row_n >= first_row; row_n--) {
+    let room_id = sheet_data[row_n][room_id_column]
+    let message_body = sheet_data[row_n][message_column]
+    let routine_day = sheet_data[row_n][sending_date_column]
     // ルームIDがなければcontinue
     if (sheet_data[row_n][room_id_column] == "") {
       continue
@@ -44,11 +30,10 @@ const send_monthly_msg = () => {
     }
 
     // メッセージの送信日がなければcontinue
-    if (sheet_data[row_n][sending_date_column]) {
+    if (sheet_data[row_n][sending_date_column] == "") {
       continue
     }
 
-    const message_body = sheet_data[row_n][message_column]
     cw_send_message(room_id, message_body)
 
 
@@ -56,3 +41,19 @@ const send_monthly_msg = () => {
 
 
 }
+
+const cw_send_message = (room_id, text) => {
+  const CW_API_TOKEN = PropertiesService.getScriptProperties().getProperty('CW_TOKEN');
+  console.log(CW_API_TOKEN)
+  const options = {
+    "method": "post",
+    "headers": {
+      "X-ChatWorkToken": CW_API_TOKEN
+    },
+    "payload": {
+      "body": text
+    }
+  };
+  const apiUrl = "https://api.chatwork.com/v2/rooms/" + room_id + "/messages";
+  const response = UrlFetchApp.fetch(apiUrl, options);
+};
