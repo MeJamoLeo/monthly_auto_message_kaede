@@ -50,7 +50,7 @@ const send_manthly_task = () => {
       continue
     }
     // 担当者のIDを取得する
-    console.log(get_members_id(room_id))
+    console.log(get_member_ids_str(room_id))
     //cw_send_task(room_id, message_body)
 
 
@@ -75,18 +75,40 @@ const cw_send_task = (room_id, text) => {
 };
 
 
-const get_members_ids = (room_id) => {
-  const CW_API_TOKEN = PropertiesService.getScriptProperties().getProperty('CW_TOKEN');
-  const options = {
-    "method": "get",
-    "headers": {
-      "X-ChatWorkToken": CW_API_TOKEN
+const get_member_ids_str = (room_id) => {
+
+  // チャットワークのルームからメンバーの情報を取得
+  const get_member_info = (room_id) => {
+    const CW_API_TOKEN = PropertiesService.getScriptProperties().getProperty('CW_TOKEN');
+    const options = {
+      "method": "get",
+      "headers": {
+        "X-ChatWorkToken": CW_API_TOKEN
+      }
     }
+    const apiUrl = "https://api.chatwork.com/v2/rooms/" + room_id + "/members";
+    const response = UrlFetchApp.fetch(apiUrl, options)
+    const jsons = JSON.parse(response.getContentText());
+
+    return jsons
   }
-  const apiUrl = "https://api.chatwork.com/v2/rooms/" + room_id + "/members";
-  const response = UrlFetchApp.fetch(apiUrl, options)
-  const jsons = JSON.parse(response.getContentText());
-  console.log(jsons)
-  return response
+
+
+  // メンバーの情報からchatwork_idのみを配列で返す
+  const get_chatwork_ids = (jsons) => {
+    let member_ids = [];
+    for (let n = 0; n < jsons.length; n++) {
+      const json = jsons[n];
+      const chatwork_id = json.chatwork_id
+      member_ids.push(chatwork_id)
+    }
+    return member_ids
+  }
+
+
+  const chatwork_id_str = get_chatwork_ids(get_member_info(room_id)).join(",")
+  console.log chatwork_id_str
+  return chatwork_id_str
+
 
 }
